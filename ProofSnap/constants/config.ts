@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════
 
 // ──── Backend API ────
-export const API_BASE_URL: string = 'https://hacksrm-tau.vercel.app';
+export const API_BASE_URL: string = 'https://hacksrm-pi.vercel.app';
 
 // ──── Supabase Cloud ────
 export const SUPABASE_URL: string = 'https://qfeknedjhjmdinwmqbru.supabase.co';
