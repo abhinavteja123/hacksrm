@@ -75,20 +75,22 @@ export type ScanProgressCallback = (progress: ScanProgress) => void;
 // ──── Request permissions ────
 
 export async function requestGalleryPermission(): Promise<boolean> {
-  // Only request photo & video access — skip AUDIO to avoid
-  // AndroidManifest crash on devices without RECORD_AUDIO in the
-  // expo-media-library plugin config.
-  try {
-    const { status } = await MediaLibrary.requestPermissionsAsync(
-      false,                   // writeOnly = false (need read access)
-      ['photo', 'video'],      // granular: skip 'audio'
-    );
-    return status === 'granted';
-  } catch {
-    // Fallback for older SDKs that don't accept granular perms
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    return status === 'granted';
-  }
+  // Request only photo & video — never audio. The expo-media-library
+  // config plugin does NOT declare READ_MEDIA_AUDIO, so requesting it
+  // causes a native rejection.  Do NOT fall back to a bare
+  // requestPermissionsAsync() call (no granular types) because that
+  // defaults to requesting audio on newer Android SDKs.
+  const { status, canAskAgain } = await MediaLibrary.requestPermissionsAsync(
+    false,              // writeOnly = false (need read access)
+    ['photo', 'video'], // granular: explicitly skip 'audio'
+  );
+
+  if (status === 'granted') return true;
+
+  // Already denied and can't ask again — user must enable in Settings.
+  if (!canAskAgain) return false;
+
+  return false;
 }
 
 // ──── Main scan function ────
