@@ -1,6 +1,6 @@
-import * as SQLite from 'expo-sqlite';
+import { getDb } from './db';
 
-let db: SQLite.SQLiteDatabase | null = null;
+let schemaInitialized = false;
 
 export interface ScannedImage {
   id: string;
@@ -17,35 +17,31 @@ export interface ScannedImage {
   albumName: string | null;
 }
 
-export async function getGalleryDb(): Promise<SQLite.SQLiteDatabase> {
-  if (!db) {
-    db = await SQLite.openDatabaseAsync('proofsnap.db');
-    await initGallerySchema();
+export async function getGalleryDb() {
+  const db = await getDb();
+  if (!schemaInitialized) {
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS scanned_images (
+        id TEXT PRIMARY KEY,
+        assetId TEXT UNIQUE NOT NULL,
+        uri TEXT NOT NULL,
+        fileName TEXT NOT NULL,
+        fileSize INTEGER DEFAULT 0,
+        originalHash TEXT NOT NULL,
+        currentHash TEXT NOT NULL,
+        source TEXT DEFAULT 'Unknown',
+        isTampered INTEGER DEFAULT 0,
+        lastCheckedAt TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        albumName TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_scanned_asset ON scanned_images(assetId);
+      CREATE INDEX IF NOT EXISTS idx_scanned_tampered ON scanned_images(isTampered);
+      CREATE INDEX IF NOT EXISTS idx_scanned_source ON scanned_images(source);
+    `);
+    schemaInitialized = true;
   }
   return db;
-}
-
-async function initGallerySchema() {
-  if (!db) return;
-  await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS scanned_images (
-      id TEXT PRIMARY KEY,
-      assetId TEXT UNIQUE NOT NULL,
-      uri TEXT NOT NULL,
-      fileName TEXT NOT NULL,
-      fileSize INTEGER DEFAULT 0,
-      originalHash TEXT NOT NULL,
-      currentHash TEXT NOT NULL,
-      source TEXT DEFAULT 'Unknown',
-      isTampered INTEGER DEFAULT 0,
-      lastCheckedAt TEXT NOT NULL,
-      createdAt TEXT NOT NULL,
-      albumName TEXT
-    );
-    CREATE INDEX IF NOT EXISTS idx_scanned_asset ON scanned_images(assetId);
-    CREATE INDEX IF NOT EXISTS idx_scanned_tampered ON scanned_images(isTampered);
-    CREATE INDEX IF NOT EXISTS idx_scanned_source ON scanned_images(source);
-  `);
 }
 
 // Insert a newly scanned image

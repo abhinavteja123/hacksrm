@@ -4,15 +4,11 @@
 // ═══════════════════════════════════════════════════════════
 
 // ──── Backend API ────
-// Your deployed Express.js server URL (use Render.com free tier)
-// Set to '' to use fully simulated results (offline mode)
-export const API_BASE_URL: string = 'https://proofsnap-api.onrender.com';
+export const API_BASE_URL: string = 'https://hacksrm-tau.vercel.app';
 
 // ──── Supabase Cloud ────
-// Free tier: supabase.com → New Project → Settings → API
-// Leave as placeholders to disable cloud features (app works fully offline)
-export const SUPABASE_URL: string = 'https://your-project.supabase.co';
-export const SUPABASE_ANON_KEY: string = 'your-anon-key';
+export const SUPABASE_URL: string = 'https://qfeknedjhjmdinwmqbru.supabase.co';
+export const SUPABASE_ANON_KEY: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZWtuZWRqaGptZGlud21xYnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNDA2NjYsImV4cCI6MjA4NzYxNjY2Nn0.q3Sdo_y_P7Yqyckf1HMcCrytbVosOybR4-yWnlZAR30';
 
 // ──── DataHaven Blockchain ────
 // Substrate-based L1 with full EVM compatibility, secured by EigenLayer

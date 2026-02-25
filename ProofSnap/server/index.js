@@ -38,9 +38,9 @@ try {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Multer for file uploads (temp storage)
+// Multer for file uploads — use memory storage (works on Vercel/serverless)
 const upload = multer({
-  dest: path.join(__dirname, 'tmp'),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
 });
 
@@ -64,10 +64,9 @@ app.post('/api/detect', upload.single('media'), async (req, res) => {
   const SIGHTENGINE_SECRET = process.env.SIGHTENGINE_SECRET;
 
   try {
-    // If no SightEngine credentials, return simulation
+    // If no SightEngine credentials, return simulated result with flag
     if (!SIGHTENGINE_USER || !SIGHTENGINE_SECRET) {
       console.log('[detect] No SightEngine credentials. Returning simulated result.');
-      cleanupFile(req.file?.path);
 
       return res.json({
         simulated: true,
@@ -90,10 +89,13 @@ app.post('/api/detect', upload.single('media'), async (req, res) => {
       return res.status(400).json({ error: 'No media file provided' });
     }
 
-    // Call SightEngine API
+    // Call SightEngine API — send buffer from memory storage
     const FormData = (await import('form-data')).default;
     const form = new FormData();
-    form.append('media', fs.createReadStream(req.file.path));
+    form.append('media', req.file.buffer, {
+      filename: req.file.originalname || 'upload.jpg',
+      contentType: req.file.mimetype || 'image/jpeg',
+    });
     form.append('models', 'deepfake,genai');
     form.append('api_user', SIGHTENGINE_USER);
     form.append('api_secret', SIGHTENGINE_SECRET);
@@ -104,7 +106,6 @@ app.post('/api/detect', upload.single('media'), async (req, res) => {
     });
 
     const data = await response.json();
-    cleanupFile(req.file.path);
 
     if (data.status === 'failure') {
       console.error('[detect] SightEngine error:', data.error);
@@ -132,7 +133,6 @@ app.post('/api/detect', upload.single('media'), async (req, res) => {
     });
   } catch (err) {
     console.error('[detect] Error:', err);
-    cleanupFile(req.file?.path);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -142,7 +142,6 @@ app.post('/api/plagiarism', upload.single('media'), async (req, res) => {
   try {
     // Simulate plagiarism check (real implementation would use
     // TinEye API, Google Vision, or Bing Visual Search)
-    cleanupFile(req.file?.path);
 
     const similarityScore = Math.random() * 15; // 0-15% = mostly original
     const hash = crypto.randomBytes(16).toString('hex');
@@ -160,7 +159,6 @@ app.post('/api/plagiarism', upload.single('media'), async (req, res) => {
     });
   } catch (err) {
     console.error('[plagiarism] Error:', err);
-    cleanupFile(req.file?.path);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -250,30 +248,24 @@ app.get('/api/proofs', async (req, res) => {
   }
 });
 
-// ──────────────── Cleanup helper ────────────────
-function cleanupFile(filePath) {
-  if (filePath && fs.existsSync(filePath)) {
-    try {
-      fs.unlinkSync(filePath);
-    } catch (e) {
-      console.warn('Failed to cleanup temp file:', filePath);
+// ──────────────── Start Server (local dev) ────────────────
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n  🛡️  ProofSnap API running on port ${PORT}`);
+    console.log(`  📍 Health: http://localhost:${PORT}/api/health`);
+    console.log(`  🔍 Detect: POST http://localhost:${PORT}/api/detect`);
+    console.log(`  🔎 Plagiarism: POST http://localhost:${PORT}/api/plagiarism`);
+    console.log(`  ⛓️  Blockchain: DataHaven Testnet (Chain ID: 55931)\n`);
+
+    if (!process.env.SIGHTENGINE_USER) {
+      console.log('  ⚠️  SIGHTENGINE_USER not set — using simulated detection');
     }
-  }
+    if (!supabase) {
+      console.log('  ⚠️  SUPABASE_URL/SUPABASE_KEY not set — cloud storage disabled');
+    }
+    console.log('');
+  });
 }
 
-// ──────────────── Start Server ────────────────
-app.listen(PORT, () => {
-  console.log(`\n  🛡️  ProofSnap API running on port ${PORT}`);
-  console.log(`  📍 Health: http://localhost:${PORT}/api/health`);
-  console.log(`  🔍 Detect: POST http://localhost:${PORT}/api/detect`);
-  console.log(`  🔎 Plagiarism: POST http://localhost:${PORT}/api/plagiarism`);
-  console.log(`  ⛓️  Blockchain: DataHaven Testnet (Chain ID: 55931)\n`);
-
-  if (!process.env.SIGHTENGINE_USER) {
-    console.log('  ⚠️  SIGHTENGINE_USER not set — using simulated detection');
-  }
-  if (!supabase) {
-    console.log('  ⚠️  SUPABASE_URL/SUPABASE_KEY not set — cloud storage disabled');
-  }
-  console.log('');
-});
+// Export for Vercel serverless
+module.exports = app;

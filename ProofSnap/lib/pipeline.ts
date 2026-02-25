@@ -142,8 +142,12 @@ export async function runVerificationPipeline(
     steps = updateStep(
       steps,
       'ai',
-      'success',
-      aiResult.isGenuine ? 'Genuine ✓' : `Suspicious (${(aiResult.deepfakeScore * 100).toFixed(0)}%)`
+      aiResult.simulated ? 'error' : 'success',
+      aiResult.simulated
+        ? 'Simulated — API unavailable'
+        : aiResult.isGenuine
+        ? 'Genuine ✓'
+        : `Suspicious (${(aiResult.deepfakeScore * 100).toFixed(0)}%)`
     );
     onProgress(steps);
     await sleep(300);
@@ -156,8 +160,12 @@ export async function runVerificationPipeline(
     steps = updateStep(
       steps,
       'plagiarism',
-      'success',
-      plagiarismResult.isOriginal ? 'Original ✓' : `${plagiarismResult.matchPercentage}% match`
+      plagiarismResult.simulated ? 'error' : 'success',
+      plagiarismResult.simulated
+        ? 'Simulated — API unavailable'
+        : plagiarismResult.isOriginal
+        ? 'Original ✓'
+        : `${plagiarismResult.matchPercentage}% match`
     );
     onProgress(steps);
     await sleep(300);

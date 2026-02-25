@@ -50,12 +50,14 @@ export interface AIDetectionResult {
   deepfakeScore: number;
   aiGeneratedScore: number;
   isGenuine: boolean;
+  simulated: boolean;
 }
 
 export interface PlagiarismResult {
   isOriginal: boolean;
   matchPercentage: number;
   sources: string[];
+  simulated: boolean;
 }
 
 export interface BlockchainProof {

@@ -31,6 +31,7 @@ export async function detectDeepfake(imageBase64: string): Promise<AIDetectionRe
 
     if (uploadResult.status >= 200 && uploadResult.status < 300) {
       const data = JSON.parse(uploadResult.body);
+      const isSimulated = data.simulated === true;
       // Server returns nested shape: { deepfake: { score }, aiGenerated: { score } }
       const deepfakeScore = data.deepfake?.score ?? data.deepfakeScore ?? 0;
       const aiGeneratedScore = data.aiGenerated?.score ?? data.aiGeneratedScore ?? 0;
@@ -38,6 +39,7 @@ export async function detectDeepfake(imageBase64: string): Promise<AIDetectionRe
         deepfakeScore: Math.round(deepfakeScore * 100) / 100,
         aiGeneratedScore: Math.round(aiGeneratedScore * 100) / 100,
         isGenuine: deepfakeScore < 0.3 && aiGeneratedScore < 0.3,
+        simulated: isSimulated,
       };
     }
   } catch (error) {
@@ -57,6 +59,7 @@ function simulateAIDetection(): AIDetectionResult {
     deepfakeScore: Math.round(deepfakeScore * 100) / 100,
     aiGeneratedScore: Math.round(aiGeneratedScore * 100) / 100,
     isGenuine: true,
+    simulated: true,
   };
 }
 
@@ -92,6 +95,7 @@ export async function checkPlagiarism(imageBase64: string): Promise<PlagiarismRe
         isOriginal: data.isOriginal ?? true,
         matchPercentage: data.plagiarismScore ?? data.matchPercentage ?? 0,
         sources: data.matches?.map((m: any) => m.source) ?? [],
+        simulated: data.simulated === true,
       };
     }
   } catch (error) {
@@ -106,5 +110,6 @@ function simulatePlagiarism(): PlagiarismResult {
     isOriginal: true,
     matchPercentage: Math.floor(Math.random() * 5),
     sources: [],
+    simulated: true,
   };
 }

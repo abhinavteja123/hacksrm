@@ -15,12 +15,20 @@ function getSupabase(): SupabaseClient {
 
 // Check if Supabase is configured (not using placeholder values)
 export function isSupabaseConfigured(): boolean {
-  return (
-    SUPABASE_URL !== 'https://your-project.supabase.co' &&
-    SUPABASE_ANON_KEY !== 'your-anon-key' &&
-    SUPABASE_URL.length > 0 &&
-    SUPABASE_ANON_KEY.length > 0
-  );
+  const configured =
+    !!SUPABASE_URL &&
+    !!SUPABASE_ANON_KEY &&
+    SUPABASE_URL.length > 10 &&
+    SUPABASE_ANON_KEY.length > 10 &&
+    SUPABASE_URL.includes('supabase.co') &&
+    !SUPABASE_URL.includes('your-project');
+  if (!configured) {
+    console.log('[Supabase] Config check failed:', {
+      url: SUPABASE_URL?.substring(0, 30),
+      keyLen: SUPABASE_ANON_KEY?.length,
+    });
+  }
+  return configured;
 }
 
 // ──────────────── Database Types ────────────────
