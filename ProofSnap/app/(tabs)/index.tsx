@@ -54,8 +54,10 @@ export default function HomeScreen() {
           <View>
             <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome to</Text>
             <Text style={[styles.appName, { color: colors.text }]}>ProofSnap</Text>
+            <Text style={[styles.tagline, { color: colors.textSecondary }]}>Proof of Capture</Text>
           </View>
-          <View style={[styles.keyPill, { backgroundColor: isDark ? Colors.dark.elevated : Colors.light.elevated }]}>
+          <View style={[styles.keyPill, { backgroundColor: isDark ? Colors.dark.elevated : Colors.light.elevated, borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+            <View style={[styles.keyDot, { backgroundColor: Colors.success }]} />
             <Ionicons name="key" size={14} color={Colors.primary[500]} />
             <Text style={[styles.keyPillText, { color: Colors.primary[500] }]}>Keys Active</Text>
           </View>
@@ -102,17 +104,27 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => router.push('/(tabs)/capture')}
             style={({ pressed }) => [
-              styles.captureButton,
               {
-                backgroundColor: Colors.primary[500],
                 opacity: pressed ? 0.9 : 1,
                 transform: [{ scale: pressed ? 0.98 : 1 }],
               },
             ]}
           >
-            <Ionicons name="camera" size={22} color="#FFFFFF" />
-            <Text style={styles.captureButtonText}>Capture & Verify</Text>
-            <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+            <LinearGradient
+              colors={['#3B82F6', '#8B5CF6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.captureButton}
+            >
+              <View style={styles.captureIconBg}>
+                <Ionicons name="camera" size={22} color="#FFFFFF" />
+              </View>
+              <View style={styles.captureTextContainer}>
+                <Text style={styles.captureButtonText}>Capture & Verify</Text>
+                <Text style={styles.captureSubtext}>Take a photo or import from gallery</Text>
+              </View>
+              <Ionicons name="arrow-forward-circle" size={24} color="rgba(255,255,255,0.7)" />
+            </LinearGradient>
           </Pressable>
         </Animated.View>
 
@@ -167,24 +179,28 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 10 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+    alignItems: 'flex-start',
+    marginBottom: 24,
   },
   greeting: { fontSize: 14, fontWeight: '500' },
-  appName: { fontSize: 28, fontWeight: '800', marginTop: 2 },
+  appName: { fontSize: 30, fontWeight: '900', marginTop: 2, letterSpacing: -0.5 },
+  tagline: { fontSize: 12, fontWeight: '500', marginTop: 2, opacity: 0.7 },
   keyPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 20,
+    borderWidth: 1,
+    marginTop: 4,
   },
-  keyPillText: { fontSize: 12, fontWeight: '600' },
+  keyDot: { width: 6, height: 6, borderRadius: 3 },
+  keyPillText: { fontSize: 11, fontWeight: '700' },
   statsRow: {
     flexDirection: 'row',
     gap: 10,
@@ -192,48 +208,62 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: 20,
+    padding: 16,
     overflow: 'hidden',
-    minHeight: 88,
+    minHeight: 96,
   },
-  statNumber: { fontSize: 26, fontWeight: '800', color: '#FFFFFF' },
-  statLabel: { fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: '600', marginTop: 4 },
-  statBgIcon: { position: 'absolute', bottom: -2, right: -2 },
+  statNumber: { fontSize: 28, fontWeight: '900', color: '#FFFFFF', letterSpacing: -0.5 },
+  statLabel: { fontSize: 11, color: 'rgba(255,255,255,0.8)', fontWeight: '700', marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  statBgIcon: { position: 'absolute', bottom: -4, right: -4, opacity: 0.1 },
   captureButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    padding: 16,
-    borderRadius: 16,
+    gap: 12,
+    padding: 18,
+    borderRadius: 20,
     marginBottom: 24,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  captureButtonText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
-  section: { marginBottom: 20 },
+  captureIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  captureTextContainer: { flex: 1 },
+  captureButtonText: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
+  captureSubtext: { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontWeight: '500' },
+  section: { marginBottom: 24 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
-  sectionTitle: { fontSize: 18, fontWeight: '700' },
-  seeAll: { fontSize: 14, fontWeight: '600' },
+  sectionTitle: { fontSize: 20, fontWeight: '800', letterSpacing: -0.3 },
+  seeAll: { fontSize: 14, fontWeight: '700' },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
-    borderRadius: 16,
+    padding: 44,
+    borderRadius: 20,
     borderWidth: 1,
   },
-  emptyText: { fontSize: 16, fontWeight: '600', marginTop: 12 },
-  emptySubtext: { fontSize: 13, marginTop: 4, textAlign: 'center' },
+  emptyText: { fontSize: 16, fontWeight: '700', marginTop: 14 },
+  emptySubtext: { fontSize: 13, marginTop: 6, textAlign: 'center', lineHeight: 18 },
   infoCard: {
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     borderWidth: 1,
   },
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   infoTextContainer: { flex: 1 },
-  infoTitle: { fontSize: 14, fontWeight: '600' },
-  infoValue: { fontSize: 12, marginTop: 2 },
+  infoTitle: { fontSize: 14, fontWeight: '700' },
+  infoValue: { fontSize: 12, marginTop: 3 },
 });

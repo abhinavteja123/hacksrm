@@ -15,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
 import { Colors } from '@/constants/Colors';
@@ -116,26 +117,43 @@ export default function CaptureScreen() {
         facing={facing}
       >
         {/* Top overlay */}
-        <View style={[styles.topOverlay, { paddingTop: insets.top + 8 }]}>
+        <LinearGradient
+          colors={['rgba(0,0,0,0.5)', 'transparent']}
+          style={[styles.topOverlay, { paddingTop: insets.top + 8 }]}
+        >
           <View style={styles.topRow}>
             <View style={styles.cameraModePill}>
+              <View style={styles.liveDot} />
               <Ionicons name="camera" size={14} color="#FFFFFF" />
-              <Text style={styles.cameraModeText}>Photo</Text>
+              <Text style={styles.cameraModeText}>ProofSnap Camera</Text>
             </View>
           </View>
+        </LinearGradient>
+
+        {/* Corner guides */}
+        <View style={styles.cornerGuides}>
+          <View style={[styles.corner, styles.cornerTL]} />
+          <View style={[styles.corner, styles.cornerTR]} />
+          <View style={[styles.corner, styles.cornerBL]} />
+          <View style={[styles.corner, styles.cornerBR]} />
         </View>
 
         {/* Bottom overlay */}
-        <View style={[styles.bottomOverlay, { paddingBottom: insets.bottom + 80 }]}>
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.7)']}
+          style={[styles.bottomOverlay, { paddingBottom: insets.bottom + 84 }]}
+        >
           {/* Import button */}
           <Pressable
             onPress={handleImport}
             style={({ pressed }) => [
               styles.sideButton,
-              { opacity: pressed ? 0.7 : 1 },
+              { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.9 : 1 }] },
             ]}
           >
-            <Ionicons name="images" size={26} color="#FFFFFF" />
+            <View style={styles.sideButtonBg}>
+              <Ionicons name="images" size={24} color="#FFFFFF" />
+            </View>
             <Text style={styles.sideButtonText}>Import</Text>
           </Pressable>
 
@@ -144,10 +162,15 @@ export default function CaptureScreen() {
             onPress={handleCapture}
             style={({ pressed }) => [
               styles.captureButton,
-              { transform: [{ scale: pressed ? 0.92 : 1 }] },
+              { transform: [{ scale: pressed ? 0.88 : 1 }] },
             ]}
           >
-            <View style={styles.captureInner} />
+            <LinearGradient
+              colors={['#3B82F6', '#8B5CF6']}
+              style={styles.captureGradient}
+            >
+              <View style={styles.captureInner} />
+            </LinearGradient>
           </Pressable>
 
           {/* Flip camera */}
@@ -158,13 +181,15 @@ export default function CaptureScreen() {
             }}
             style={({ pressed }) => [
               styles.sideButton,
-              { opacity: pressed ? 0.7 : 1 },
+              { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.9 : 1 }] },
             ]}
           >
-            <Ionicons name="camera-reverse" size={26} color="#FFFFFF" />
+            <View style={styles.sideButtonBg}>
+              <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
+            </View>
             <Text style={styles.sideButtonText}>Flip</Text>
           </Pressable>
-        </View>
+        </LinearGradient>
       </CameraView>
 
       {/* Verification Modal */}
@@ -232,6 +257,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   topRow: {
     flexDirection: 'row',
@@ -242,12 +268,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  cameraModeText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#EF4444',
+  },
+  cameraModeText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
+  cornerGuides: {
+    position: 'absolute',
+    top: '20%',
+    left: '10%',
+    right: '10%',
+    bottom: '28%',
+  },
+  corner: {
+    position: 'absolute',
+    width: 24,
+    height: 24,
+    borderColor: 'rgba(255,255,255,0.5)',
+  },
+  cornerTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 },
+  cornerTR: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2 },
+  cornerBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
+  cornerBR: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 },
   bottomOverlay: {
     position: 'absolute',
     bottom: 0,
@@ -257,66 +308,89 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 32,
+    paddingTop: 30,
   },
   captureButton: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    borderWidth: 4,
-    borderColor: '#FFFFFF',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     padding: 3,
   },
+  captureGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 40,
+    padding: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   captureInner: {
-    flex: 1,
-    borderRadius: 34,
+    width: '100%',
+    height: '100%',
+    borderRadius: 36,
     backgroundColor: '#FFFFFF',
   },
   sideButton: {
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
-  sideButtonText: { color: '#FFFFFF', fontSize: 11, fontWeight: '500' },
-  permissionText: { fontSize: 20, fontWeight: '700', marginTop: 20 },
-  permissionSubtext: { fontSize: 14, textAlign: 'center', marginTop: 8, lineHeight: 20 },
+  sideButtonBg: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  sideButtonText: { color: '#FFFFFF', fontSize: 11, fontWeight: '600' },
+  permissionText: { fontSize: 22, fontWeight: '800', marginTop: 20 },
+  permissionSubtext: { fontSize: 14, textAlign: 'center', marginTop: 10, lineHeight: 22, opacity: 0.8 },
   permissionButton: {
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 14,
-    marginTop: 24,
+    paddingHorizontal: 36,
+    paddingVertical: 16,
+    borderRadius: 18,
+    marginTop: 28,
   },
-  permissionButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  importAltButton: { marginTop: 16 },
-  importAltText: { fontSize: 14, fontWeight: '600' },
+  permissionButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
+  importAltButton: { marginTop: 18 },
+  importAltText: { fontSize: 14, fontWeight: '700' },
   // Modal
   modalContainer: { flex: 1, paddingTop: 12 },
   modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+    width: 44,
+    height: 5,
+    borderRadius: 3,
     alignSelf: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  modalContent: { padding: 20, paddingBottom: 40 },
-  modalTitle: { fontSize: 22, fontWeight: '800', marginBottom: 20, textAlign: 'center' },
-  resultContainer: { alignItems: 'center', marginTop: 24, gap: 12 },
-  resultText: { fontSize: 18, fontWeight: '700', marginTop: 8 },
-  txText: { fontSize: 12, marginTop: 4 },
+  modalContent: { padding: 20, paddingBottom: 44 },
+  modalTitle: { fontSize: 24, fontWeight: '900', marginBottom: 24, textAlign: 'center', letterSpacing: -0.3 },
+  resultContainer: { alignItems: 'center', marginTop: 28, gap: 14 },
+  resultText: { fontSize: 20, fontWeight: '800', marginTop: 8 },
+  txText: { fontSize: 12, marginTop: 4, opacity: 0.7 },
   viewDetailsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    borderRadius: 14,
-    marginTop: 16,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 18,
+    marginTop: 20,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  viewDetailsText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  viewDetailsText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
   runningIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    marginTop: 20,
+    gap: 10,
+    marginTop: 24,
   },
-  runningText: { fontSize: 14 },
+  runningText: { fontSize: 14, fontWeight: '500' },
 });

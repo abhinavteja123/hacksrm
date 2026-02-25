@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Image, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { TrustBadge } from './TrustBadge';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Colors } from '@/constants/Colors';
@@ -50,6 +52,18 @@ export function MediaCard({ record }: MediaCardProps) {
         <View style={styles.badgeOverlay}>
           <TrustBadge score={record.trustScore} size="sm" />
         </View>
+        {/* Watermark overlay */}
+        {record.status === 'verified' && (
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.6)']}
+            style={styles.cardWatermark}
+          >
+            <View style={styles.cardWmBadge}>
+              <Ionicons name="shield-checkmark" size={10} color="#FFFFFF" />
+              <Text style={styles.cardWmText}>Verified</Text>
+            </View>
+          </LinearGradient>
+        )}
         {/* Status indicator */}
         <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
       </View>
@@ -109,15 +123,21 @@ export function MediaListCard({ record }: MediaCardProps) {
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
     marginBottom: GRID_GAP,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   imageContainer: {
     width: '100%',
     height: CARD_WIDTH,
     position: 'relative',
+    backgroundColor: '#000',
   },
   image: {
     width: '100%',
@@ -136,27 +156,53 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
+  cardWatermark: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    paddingTop: 18,
+  },
+  cardWmBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  cardWmText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '700',
+  },
   info: {
-    padding: 10,
+    padding: 12,
   },
   scoreText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   dateText: {
     fontSize: 11,
-    marginTop: 2,
+    marginTop: 3,
+    opacity: 0.7,
   },
   listCard: {
     flexDirection: 'row',
-    borderRadius: 14,
+    borderRadius: 18,
     overflow: 'hidden',
     borderWidth: 1,
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   listImage: {
-    width: 72,
-    height: 72,
+    width: 76,
+    height: 76,
+    backgroundColor: '#000',
   },
   listInfo: {
     flex: 1,

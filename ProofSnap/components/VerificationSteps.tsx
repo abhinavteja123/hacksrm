@@ -97,17 +97,18 @@ const styles = StyleSheet.create({
   step: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    marginBottom: 4,
-    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginBottom: 6,
+    borderRadius: 16,
     borderWidth: 1,
   },
   stepIconContainer: {
-    width: 28,
-    height: 28,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 16,
   },
   connector: {
     position: 'absolute',
@@ -125,13 +126,15 @@ const styles = StyleSheet.create({
   },
   stepContent: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 12,
   },
   stepLabel: {
     fontSize: 14,
+    fontWeight: '500',
   },
   stepDetail: {
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 3,
+    fontWeight: '500',
   },
 });

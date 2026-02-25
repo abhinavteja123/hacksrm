@@ -78,10 +78,12 @@ export default function RootLayout() {
             animation: 'slide_from_right',
             headerShown: true,
             headerTitle: 'Verification Details',
+            headerTitleStyle: { fontWeight: '800', fontSize: 17 },
             headerTintColor: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
             headerStyle: {
               backgroundColor: colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
             },
+            headerShadowVisible: false,
           }}
         />
       </Stack>

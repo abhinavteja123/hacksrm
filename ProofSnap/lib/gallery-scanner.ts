@@ -75,7 +75,9 @@ export type ScanProgressCallback = (progress: ScanProgress) => void;
 // ──── Request permissions ────
 
 export async function requestGalleryPermission(): Promise<boolean> {
-  const { status } = await MediaLibrary.requestPermissionsAsync();
+  // Pass false to skip requesting AUDIO/microphone permission
+  // (only request photo/video access)
+  const { status } = await MediaLibrary.requestPermissionsAsync(false);
   return status === 'granted';
 }
 

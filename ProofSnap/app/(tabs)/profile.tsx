@@ -11,6 +11,7 @@ import { useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
 
 import { Colors } from '@/constants/Colors';
@@ -91,9 +92,14 @@ export default function ProfileScreen() {
       >
         {/* Profile Header */}
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerSection}>
-          <View style={[styles.avatar, { backgroundColor: Colors.primary[500] }]}>
+          <LinearGradient
+            colors={['#3B82F6', '#8B5CF6']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.avatar}
+          >
             <Ionicons name="shield-checkmark" size={36} color="#FFFFFF" />
-          </View>
+          </LinearGradient>
           <Text style={[styles.headerTitle, { color: colors.text }]}>ProofSnap</Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
             Media Authentication System
@@ -101,7 +107,7 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Stats */}
-        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.statsContainer}>
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={[styles.statsContainer, { backgroundColor: isDark ? Colors.dark.card : Colors.light.card, borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
           <View style={styles.statItem}>
             <Text style={[styles.statNumber, { color: Colors.primary[500] }]}>{stats.total}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Total</Text>
@@ -198,70 +204,77 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16 },
-  headerSection: { alignItems: 'center', marginBottom: 24 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 10 },
+  headerSection: { alignItems: 'center', marginBottom: 28 },
   avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  headerTitle: { fontSize: 24, fontWeight: '800' },
-  headerSubtitle: { fontSize: 14, marginTop: 4 },
+  headerTitle: { fontSize: 26, fontWeight: '900', letterSpacing: -0.3 },
+  headerSubtitle: { fontSize: 14, marginTop: 4, fontWeight: '500' },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     marginBottom: 28,
-    paddingVertical: 8,
+    paddingVertical: 16,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   statItem: { alignItems: 'center' },
-  statNumber: { fontSize: 24, fontWeight: '800' },
-  statLabel: { fontSize: 12, fontWeight: '500', marginTop: 2 },
-  statDivider: { width: 1, height: 32 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 10, marginTop: 8 },
+  statNumber: { fontSize: 26, fontWeight: '900' },
+  statLabel: { fontSize: 12, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
+  statDivider: { width: 1, height: 36 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10, marginTop: 10 },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    borderRadius: 14,
+    padding: 16,
+    borderRadius: 18,
     borderWidth: 1,
     marginBottom: 8,
-    gap: 12,
+    gap: 14,
   },
   iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
   infoContent: { flex: 1 },
-  infoLabel: { fontSize: 11, fontWeight: '500' },
-  infoValue: { fontSize: 14, fontWeight: '600', marginTop: 2 },
-  copyButton: { padding: 8 },
+  infoLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.3 },
+  infoValue: { fontSize: 14, fontWeight: '600', marginTop: 3 },
+  copyButton: { padding: 10 },
   howItWorks: {
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    padding: 16,
-    marginTop: 10,
+    padding: 20,
+    marginTop: 12,
   },
-  howTitle: { fontSize: 16, fontWeight: '700', marginBottom: 14 },
+  howTitle: { fontSize: 18, fontWeight: '800', marginBottom: 16 },
   howStep: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 10,
+    gap: 14,
+    marginBottom: 12,
   },
   howStepNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  howStepNumberText: { fontSize: 13, fontWeight: '700' },
-  howStepText: { fontSize: 14, flex: 1 },
+  howStepNumberText: { fontSize: 14, fontWeight: '800' },
+  howStepText: { fontSize: 14, flex: 1, fontWeight: '500' },
 });

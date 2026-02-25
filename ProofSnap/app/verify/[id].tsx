@@ -10,14 +10,16 @@ import {
   Linking,
   Share,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Colors, GRADES, getGrade } from '@/constants/Colors';
-import { BLOCK_EXPLORER } from '@/constants/config';
+import { BLOCK_EXPLORER, DATAHAVEN_CHAIN_ID, DATAHAVEN_RPC } from '@/constants/config';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getRecordById } from '@/lib/db';
 import type { MediaRecord } from '@/lib/types';
@@ -29,6 +31,7 @@ export default function VerifyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { isDark, colors } = useThemeColors();
   const [record, setRecord] = useState<MediaRecord | null>(null);
+  const [showTxModal, setShowTxModal] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     crypto: true,
     blockchain: true,
@@ -159,10 +162,21 @@ export default function VerifyDetailScreen() {
             <Image source={{ uri: record.fileUri }} style={styles.heroImage} resizeMode="cover" />
             {/* Watermark overlay preview */}
             <View style={styles.watermarkOverlay}>
-              <View style={styles.watermarkBadge}>
-                <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
-                <Text style={styles.watermarkText}>ProofSnap Verified</Text>
-              </View>
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.7)']}
+                style={styles.watermarkGradient}
+              >
+                <View style={styles.watermarkBadge}>
+                  <Ionicons name="shield-checkmark" size={16} color="#FFFFFF" />
+                  <Text style={styles.watermarkText}>ProofSnap Verified</Text>
+                  <Text style={styles.watermarkScore}>
+                    {record.trustScore}/100
+                  </Text>
+                </View>
+                <Text style={styles.watermarkHash}>
+                  #{record.fileHash.substring(0, 12)}
+                </Text>
+              </LinearGradient>
             </View>
             {/* Status pill */}
             <View
@@ -204,19 +218,7 @@ export default function VerifyDetailScreen() {
 
           {record.blockchainTx && (
             <Pressable
-              onPress={() => {
-                const explorerUrl = `${BLOCK_EXPLORER}/tx/${record.blockchainTx}`;
-                Linking.openURL(explorerUrl).catch(() => {
-                  Alert.alert(
-                    'Explorer Unavailable',
-                    `Could not open the block explorer. The transaction hash is:\n\n${record.blockchainTx}\n\nExplorer URL: ${explorerUrl}`,
-                    [
-                      { text: 'Copy Tx Hash', onPress: () => copyText(record.blockchainTx!, 'Tx Hash') },
-                      { text: 'OK' },
-                    ]
-                  );
-                });
-              }}
+              onPress={() => setShowTxModal(true)}
               style={({ pressed }) => [
                 styles.actionButton,
                 {
@@ -332,6 +334,122 @@ export default function VerifyDetailScreen() {
 
         <View style={{ height: 30 }} />
       </ScrollView>
+
+      {/* On-Chain Transaction Detail Modal */}
+      <Modal
+        visible={showTxModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowTxModal(false)}
+      >
+        <View style={styles.txModalOverlay}>
+          <View
+            style={[
+              styles.txModalContent,
+              {
+                backgroundColor: isDark ? Colors.dark.card : Colors.light.card,
+                borderColor: isDark ? Colors.dark.border : Colors.light.border,
+              },
+            ]}
+          >
+            <View style={styles.txModalHeader}>
+              <LinearGradient
+                colors={['#3B82F6', '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.txModalIconBg}
+              >
+                <Ionicons name="cube" size={28} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={[styles.txModalTitle, { color: colors.text }]}>On-Chain Proof</Text>
+              <Text style={[styles.txModalSubtitle, { color: colors.textSecondary }]}>
+                Anchored on DataHaven Testnet
+              </Text>
+            </View>
+
+            <ScrollView style={styles.txModalBody} showsVerticalScrollIndicator={false}>
+              <View style={[styles.txDetailRow, { borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>Transaction Hash</Text>
+                <Pressable onPress={() => copyText(record.blockchainTx!, 'Tx Hash')} style={styles.txCopyRow}>
+                  <Text style={[styles.txDetailValue, { color: colors.text }]} numberOfLines={2}>
+                    {record.blockchainTx}
+                  </Text>
+                  <Ionicons name="copy-outline" size={16} color={Colors.primary[500]} />
+                </Pressable>
+              </View>
+
+              <View style={[styles.txDetailRow, { borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>Block Number</Text>
+                <Text style={[styles.txDetailValue, { color: colors.text }]}>
+                  {record.blockNumber?.toString() ?? 'Pending'}
+                </Text>
+              </View>
+
+              <View style={[styles.txDetailRow, { borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>Network</Text>
+                <View style={styles.txNetworkRow}>
+                  <View style={[styles.txNetworkDot, { backgroundColor: Colors.success }]} />
+                  <Text style={[styles.txDetailValue, { color: colors.text }]}>DataHaven Testnet</Text>
+                </View>
+              </View>
+
+              <View style={[styles.txDetailRow, { borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>Chain ID</Text>
+                <Text style={[styles.txDetailValue, { color: colors.text }]}>{DATAHAVEN_CHAIN_ID}</Text>
+              </View>
+
+              <View style={[styles.txDetailRow, { borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>RPC Endpoint</Text>
+                <Pressable onPress={() => copyText(DATAHAVEN_RPC, 'RPC URL')} style={styles.txCopyRow}>
+                  <Text style={[styles.txDetailValue, { color: colors.text }]} numberOfLines={1}>
+                    {DATAHAVEN_RPC}
+                  </Text>
+                  <Ionicons name="copy-outline" size={16} color={Colors.primary[500]} />
+                </Pressable>
+              </View>
+
+              <View style={[styles.txDetailRow, { borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>File Hash (Anchored)</Text>
+                <Pressable onPress={() => copyText(record.fileHash, 'File Hash')} style={styles.txCopyRow}>
+                  <Text style={[styles.txDetailValue, { color: colors.text }]} numberOfLines={1}>
+                    {record.fileHash}
+                  </Text>
+                  <Ionicons name="copy-outline" size={16} color={Colors.primary[500]} />
+                </Pressable>
+              </View>
+
+              <View style={[styles.txDetailRow, { borderColor: 'transparent' }]}>
+                <Text style={[styles.txDetailLabel, { color: colors.textSecondary }]}>Timestamp</Text>
+                <Text style={[styles.txDetailValue, { color: colors.text }]}>
+                  {new Date(record.timestamp).toLocaleString()}
+                </Text>
+              </View>
+            </ScrollView>
+
+            <View style={styles.txModalActions}>
+              <Pressable
+                onPress={() => {
+                  const explorerUrl = `${BLOCK_EXPLORER}/tx/${record.blockchainTx}`;
+                  Linking.openURL(explorerUrl).catch(() => {
+                    Alert.alert('Explorer Error', 'Could not open the DataHaven block explorer. Please try again later.');
+                  });
+                }}
+                style={[styles.txModalBtn, { backgroundColor: isDark ? Colors.dark.elevated : Colors.light.elevated }]}
+              >
+                <Ionicons name="globe-outline" size={16} color={colors.text} />
+                <Text style={[styles.txModalBtnText, { color: colors.text }]}>View on Explorer</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowTxModal(false)}
+                style={[styles.txModalBtn, { backgroundColor: Colors.primary[500] }]}
+              >
+                <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                <Text style={[styles.txModalBtnText, { color: '#FFFFFF' }]}>Done</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -350,40 +468,48 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 20 },
   heroContainer: {
     width: width,
-    height: width * 0.7,
+    height: width * 0.75,
     position: 'relative',
+    backgroundColor: '#000',
   },
   heroImage: { width: '100%', height: '100%' },
   watermarkOverlay: {
     position: 'absolute',
-    bottom: 12,
-    right: 12,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  watermarkGradient: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    paddingTop: 30,
   },
   watermarkBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
+    gap: 6,
   },
-  watermarkText: { color: '#FFFFFF', fontSize: 11, fontWeight: '600' },
+  watermarkText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  watermarkScore: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '600', marginLeft: 4 },
+  watermarkHash: { color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: '500', marginTop: 2, fontFamily: 'monospace' },
   statusPill: {
     position: 'absolute',
     top: 12,
     left: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   statusText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  scoreContainer: { alignItems: 'center', paddingVertical: 20 },
+  scoreContainer: { alignItems: 'center', paddingVertical: 24 },
   actionsRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
     paddingHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   actionButton: {
     flex: 1,
@@ -391,14 +517,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 12,
-    borderRadius: 14,
+    paddingVertical: 14,
+    borderRadius: 16,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
   },
   actionButtonText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
   section: {
     marginHorizontal: 16,
-    marginBottom: 10,
-    borderRadius: 16,
+    marginBottom: 12,
+    borderRadius: 20,
     borderWidth: 1,
     overflow: 'hidden',
   },
@@ -406,17 +537,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 14,
+    padding: 16,
   },
-  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { fontSize: 15, fontWeight: '700' },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  sectionTitle: { fontSize: 15, fontWeight: '800' },
   sectionContent: {
-    paddingHorizontal: 14,
-    paddingBottom: 14,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     paddingTop: 4,
   },
-  dataRow: { marginBottom: 10 },
-  dataLabel: { fontSize: 11, fontWeight: '500', marginBottom: 3 },
+  dataRow: { marginBottom: 12 },
+  dataLabel: { fontSize: 11, fontWeight: '600', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.3 },
   dataValueRow: { flexDirection: 'row', alignItems: 'center' },
   dataValue: { fontSize: 13, fontWeight: '600', flex: 1 },
   copyBtn: { padding: 4, marginLeft: 6 },
@@ -428,4 +559,60 @@ const styles = StyleSheet.create({
   scoreBarFill: { height: 6, borderRadius: 3 },
   verdictRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   verdictText: { fontSize: 13, fontWeight: '600' },
+  // Tx Modal styles
+  txModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  txModalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    maxHeight: '85%',
+    paddingBottom: 30,
+  },
+  txModalHeader: {
+    alignItems: 'center',
+    paddingTop: 24,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+  },
+  txModalIconBg: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  txModalTitle: { fontSize: 20, fontWeight: '800' },
+  txModalSubtitle: { fontSize: 13, marginTop: 4 },
+  txModalBody: { paddingHorizontal: 20 },
+  txDetailRow: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  txDetailLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
+  txDetailValue: { fontSize: 14, fontWeight: '500' },
+  txCopyRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  txNetworkRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  txNetworkDot: { width: 8, height: 8, borderRadius: 4 },
+  txModalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  txModalBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  txModalBtnText: { fontSize: 14, fontWeight: '700' },
 });

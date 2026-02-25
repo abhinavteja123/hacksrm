@@ -16,7 +16,8 @@ export const SUPABASE_ANON_KEY: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e
 export const DATAHAVEN_RPC: string = 'https://services.datahaven-testnet.network/testnet';
 export const DATAHAVEN_WSS: string = 'wss://services.datahaven-testnet.network/testnet';
 export const DATAHAVEN_CHAIN_ID: number = 55931;
-export const DATAHAVEN_EXPLORER: string = 'https://datahaven-testnet.calderaexplorer.xyz';
+// DataHaven testnet explorer (Blockscout-based)
+export const DATAHAVEN_EXPLORER: string = 'https://testnet.dhscan.io';
 export const DATAHAVEN_MSP_URL: string = 'https://deo-dh-backend.testnet.datahaven-infra.network/';
 export const DATAHAVEN_FAUCET: string = 'https://apps.datahaven.xyz/faucet';
 export const BLOCK_EXPLORER: string = DATAHAVEN_EXPLORER;

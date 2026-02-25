@@ -25,7 +25,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO"]
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO", "READ_MEDIA_IMAGES", "READ_MEDIA_VIDEO", "ACCESS_MEDIA_LOCATION"]
     },
     "web": {
       "output": "static",
@@ -57,6 +57,14 @@
         "expo-image-picker",
         {
           "photosPermission": "ProofSnap needs photo library access to import media for verification."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "ProofSnap needs photo library access to scan your gallery for tampered images.",
+          "savePhotosPermission": "ProofSnap needs permission to save verified images.",
+          "isAccessMediaLocationEnabled": true
         }
       ],
       "expo-secure-store",

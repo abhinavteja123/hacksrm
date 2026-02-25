@@ -97,12 +97,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   score: {
-    fontSize: 42,
-    fontWeight: '800',
+    fontSize: 44,
+    fontWeight: '900',
+    letterSpacing: -1,
   },
   gradeLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    marginTop: 2,
+    fontWeight: '700',
+    marginTop: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });
