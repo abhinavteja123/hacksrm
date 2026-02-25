@@ -108,7 +108,13 @@ export async function runVerificationPipeline(
     // Step 3: Blockchain anchor
     steps = updateStep(steps, 'blockchain', 'running');
     onProgress(steps);
-    const bcResult = await anchorProof(fileHash, signature, publicKey);
+    let bcResult: { txHash: string; blockNumber: number } | null = null;
+    let bcError: string | null = null;
+    try {
+      bcResult = await anchorProof(fileHash, signature, publicKey);
+    } catch (err: any) {
+      bcError = err?.message ?? 'Anchoring failed';
+    }
     if (bcResult) {
       record.blockchainTx = bcResult.txHash;
       record.blockNumber = bcResult.blockNumber;
@@ -119,7 +125,12 @@ export async function runVerificationPipeline(
         `Tx: ${bcResult.txHash.substring(0, 10)}...`
       );
     } else {
-      steps = updateStep(steps, 'blockchain', 'error', 'Failed - will retry');
+      steps = updateStep(
+        steps,
+        'blockchain',
+        'error',
+        bcError ?? 'Failed - will retry'
+      );
     }
     onProgress(steps);
     await sleep(300);

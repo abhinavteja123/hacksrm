@@ -120,6 +120,27 @@ export async function verifyProofOnSupabase(
   }
 }
 
+// ──────────────── Verify Proof by Blockchain TX Hash ────────────────
+
+export async function verifyProofByTxHash(
+  txHash: string
+): Promise<SupabaseProof | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  try {
+    const { data, error } = await getSupabase()
+      .from('proofs')
+      .select('*')
+      .eq('blockchain_tx', txHash)
+      .single();
+
+    if (error || !data) return null;
+    return data as SupabaseProof;
+  } catch {
+    return null;
+  }
+}
+
 // ──────────────── Get All Proofs (Global Feed) ────────────────
 
 export async function getRecentProofs(limit = 20): Promise<SupabaseProof[]> {

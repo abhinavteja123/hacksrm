@@ -25,4 +25,11 @@ export const BLOCK_EXPLORER: string = DATAHAVEN_EXPLORER;
 // ──── Smart Contract ────
 // Deploy contracts/MediaProof.sol on DataHaven Testnet via Remix IDE
 // Then paste the deployed address here
-export const CONTRACT_ADDRESS: string = '0x0000000000000000000000000000000000000000';
+export const CONTRACT_ADDRESS: string = '0xb248fD8EDc735f60bC4B060d26dfAc07eEc95bC4';
+
+// ──── Funded Wallet ────
+// Private key (64-char hex) of the wallet that deployed the contract & has MOCK tokens.
+// Leave as empty string to use a device-generated random wallet instead.
+// The WALLET ADDRESS (0x...) is NOT the private key — they are different values.
+// NEVER commit a real mainnet private key — this is testnet only.
+export const WALLET_PRIVATE_KEY: string = '5b78406c244c17efac22957797c61ad061e517b7a338a63a97ad8e96604a45f1';

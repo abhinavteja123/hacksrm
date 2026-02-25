@@ -75,10 +75,20 @@ export type ScanProgressCallback = (progress: ScanProgress) => void;
 // ──── Request permissions ────
 
 export async function requestGalleryPermission(): Promise<boolean> {
-  // Pass false to skip requesting AUDIO/microphone permission
-  // (only request photo/video access)
-  const { status } = await MediaLibrary.requestPermissionsAsync(false);
-  return status === 'granted';
+  // Only request photo & video access — skip AUDIO to avoid
+  // AndroidManifest crash on devices without RECORD_AUDIO in the
+  // expo-media-library plugin config.
+  try {
+    const { status } = await MediaLibrary.requestPermissionsAsync(
+      false,                   // writeOnly = false (need read access)
+      ['photo', 'video'],      // granular: skip 'audio'
+    );
+    return status === 'granted';
+  } catch {
+    // Fallback for older SDKs that don't accept granular perms
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    return status === 'granted';
+  }
 }
 
 // ──── Main scan function ────

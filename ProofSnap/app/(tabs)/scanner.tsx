@@ -53,6 +53,7 @@ export default function ScannerScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      // Non-blocking: load data asynchronously so UI doesn't freeze
       loadData();
     }, [])
   );

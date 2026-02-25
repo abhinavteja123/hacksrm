@@ -115,82 +115,83 @@ export default function CaptureScreen() {
         ref={cameraRef}
         style={styles.camera}
         facing={facing}
+      />
+
+      {/* Top overlay */}
+      <LinearGradient
+        colors={['rgba(0,0,0,0.5)', 'transparent']}
+        style={[styles.topOverlay, { paddingTop: insets.top + 8 }]}
+        pointerEvents="none"
       >
-        {/* Top overlay */}
-        <LinearGradient
-          colors={['rgba(0,0,0,0.5)', 'transparent']}
-          style={[styles.topOverlay, { paddingTop: insets.top + 8 }]}
-        >
-          <View style={styles.topRow}>
-            <View style={styles.cameraModePill}>
-              <View style={styles.liveDot} />
-              <Ionicons name="camera" size={14} color="#FFFFFF" />
-              <Text style={styles.cameraModeText}>ProofSnap Camera</Text>
-            </View>
+        <View style={styles.topRow}>
+          <View style={styles.cameraModePill}>
+            <View style={styles.liveDot} />
+            <Ionicons name="camera" size={14} color="#FFFFFF" />
+            <Text style={styles.cameraModeText}>ProofSnap Camera</Text>
           </View>
-        </LinearGradient>
-
-        {/* Corner guides */}
-        <View style={styles.cornerGuides}>
-          <View style={[styles.corner, styles.cornerTL]} />
-          <View style={[styles.corner, styles.cornerTR]} />
-          <View style={[styles.corner, styles.cornerBL]} />
-          <View style={[styles.corner, styles.cornerBR]} />
         </View>
+      </LinearGradient>
 
-        {/* Bottom overlay */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.7)']}
-          style={[styles.bottomOverlay, { paddingBottom: insets.bottom + 84 }]}
+      {/* Corner guides */}
+      <View style={styles.cornerGuides} pointerEvents="none">
+        <View style={[styles.corner, styles.cornerTL]} />
+        <View style={[styles.corner, styles.cornerTR]} />
+        <View style={[styles.corner, styles.cornerBL]} />
+        <View style={[styles.corner, styles.cornerBR]} />
+      </View>
+
+      {/* Bottom overlay */}
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.7)']}
+        style={[styles.bottomOverlay, { paddingBottom: insets.bottom + 84 }]}
+      >
+        {/* Import button */}
+        <Pressable
+          onPress={handleImport}
+          style={({ pressed }) => [
+            styles.sideButton,
+            { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.9 : 1 }] },
+          ]}
         >
-          {/* Import button */}
-          <Pressable
-            onPress={handleImport}
-            style={({ pressed }) => [
-              styles.sideButton,
-              { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.9 : 1 }] },
-            ]}
-          >
-            <View style={styles.sideButtonBg}>
-              <Ionicons name="images" size={24} color="#FFFFFF" />
-            </View>
-            <Text style={styles.sideButtonText}>Import</Text>
-          </Pressable>
+          <View style={styles.sideButtonBg}>
+            <Ionicons name="images" size={24} color="#FFFFFF" />
+          </View>
+          <Text style={styles.sideButtonText}>Import</Text>
+        </Pressable>
 
-          {/* Capture button */}
-          <Pressable
-            onPress={handleCapture}
-            style={({ pressed }) => [
-              styles.captureButton,
-              { transform: [{ scale: pressed ? 0.88 : 1 }] },
-            ]}
+        {/* Capture button */}
+        <Pressable
+          onPress={handleCapture}
+          style={({ pressed }) => [
+            styles.captureButton,
+            { transform: [{ scale: pressed ? 0.88 : 1 }] },
+          ]}
+        >
+          <LinearGradient
+            colors={['#3B82F6', '#8B5CF6']}
+            style={styles.captureGradient}
           >
-            <LinearGradient
-              colors={['#3B82F6', '#8B5CF6']}
-              style={styles.captureGradient}
-            >
-              <View style={styles.captureInner} />
-            </LinearGradient>
-          </Pressable>
+            <View style={styles.captureInner} />
+          </LinearGradient>
+        </Pressable>
 
-          {/* Flip camera */}
-          <Pressable
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setFacing((f) => (f === 'back' ? 'front' : 'back'));
-            }}
-            style={({ pressed }) => [
-              styles.sideButton,
-              { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.9 : 1 }] },
-            ]}
-          >
-            <View style={styles.sideButtonBg}>
-              <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
-            </View>
-            <Text style={styles.sideButtonText}>Flip</Text>
-          </Pressable>
-        </LinearGradient>
-      </CameraView>
+        {/* Flip camera */}
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setFacing((f) => (f === 'back' ? 'front' : 'back'));
+          }}
+          style={({ pressed }) => [
+            styles.sideButton,
+            { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.9 : 1 }] },
+          ]}
+        >
+          <View style={styles.sideButtonBg}>
+            <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
+          </View>
+          <Text style={styles.sideButtonText}>Flip</Text>
+        </Pressable>
+      </LinearGradient>
 
       {/* Verification Modal */}
       <Modal
@@ -203,31 +204,99 @@ export default function CaptureScreen() {
           <View style={[styles.modalHandle, { backgroundColor: isDark ? Colors.dark.elevated : Colors.light.border }]} />
 
           <ScrollView contentContainerStyle={styles.modalContent} showsVerticalScrollIndicator={false}>
+            {/* Header icon */}
+            <Animated.View entering={FadeIn.duration(400)} style={styles.modalHeaderIcon}>
+              <LinearGradient
+                colors={currentVerification?.isRunning ? ['#3B82F6', '#8B5CF6'] : ['#10B981', '#059669']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modalIconCircle}
+              >
+                <Ionicons
+                  name={currentVerification?.isRunning ? 'shield-half' : 'shield-checkmark'}
+                  size={32}
+                  color="#FFFFFF"
+                />
+              </LinearGradient>
+            </Animated.View>
+
             <Text style={[styles.modalTitle, { color: colors.text }]}>
               {currentVerification?.isRunning ? 'Verifying Media...' : 'Verification Complete'}
             </Text>
+            <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
+              {currentVerification?.isRunning
+                ? 'Please wait while we authenticate your media'
+                : 'Your media has been cryptographically verified'}
+            </Text>
 
             {currentVerification?.steps && currentVerification.steps.length > 0 && (
-              <VerificationSteps steps={currentVerification.steps} />
+              <View style={styles.stepsWrapper}>
+                <VerificationSteps steps={currentVerification.steps} />
+              </View>
             )}
 
             {!currentVerification?.isRunning && currentVerification?.result && (
               <Animated.View entering={FadeInUp.springify()} style={styles.resultContainer}>
-                <TrustScoreCircle score={currentVerification.result.trustScore} />
-                <Text style={[styles.resultText, { color: colors.text }]}>
-                  Media Verified Successfully
-                </Text>
-                {currentVerification.result.blockchainTx && (
-                  <Text style={[styles.txText, { color: colors.textSecondary }]} numberOfLines={1}>
-                    Blockchain Tx: {currentVerification.result.blockchainTx.substring(0, 18)}...
+                {/* Trust score */}
+                <View style={[styles.resultCard, { backgroundColor: isDark ? Colors.dark.card : Colors.light.card, borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                  <TrustScoreCircle score={currentVerification.result.trustScore} />
+                  <Text style={[styles.resultText, { color: colors.text }]}>
+                    Media Verified Successfully
                   </Text>
-                )}
+                </View>
+
+                {/* Result details */}
+                <View style={[styles.resultDetailsCard, { backgroundColor: isDark ? Colors.dark.card : Colors.light.card, borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
+                  {currentVerification.result.blockchainTx && (
+                    <View style={styles.resultDetailRow}>
+                      <View style={[styles.resultDetailIcon, { backgroundColor: '#8B5CF620' }]}>
+                        <Ionicons name="link" size={16} color="#8B5CF6" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.resultDetailLabel, { color: colors.textSecondary }]}>Blockchain Tx</Text>
+                        <Text style={[styles.resultDetailValue, { color: colors.text }]} numberOfLines={1}>
+                          {currentVerification.result.blockchainTx.substring(0, 24)}...
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                  <View style={styles.resultDetailRow}>
+                    <View style={[styles.resultDetailIcon, { backgroundColor: '#3B82F620' }]}>
+                      <Ionicons name="finger-print" size={16} color="#3B82F6" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.resultDetailLabel, { color: colors.textSecondary }]}>File Hash (SHA-256)</Text>
+                      <Text style={[styles.resultDetailValue, { color: colors.text }]} numberOfLines={1}>
+                        {currentVerification.result.fileHash.substring(0, 24)}...
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.resultDetailRow}>
+                    <View style={[styles.resultDetailIcon, { backgroundColor: '#10B98120' }]}>
+                      <Ionicons name="shield-checkmark" size={16} color="#10B981" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.resultDetailLabel, { color: colors.textSecondary }]}>Trust Grade</Text>
+                      <Text style={[styles.resultDetailValue, { color: colors.text }]}>
+                        Grade {currentVerification.result.trustGrade} — Score {currentVerification.result.trustScore}/100
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
                 <Pressable
                   onPress={handleDismissVerification}
-                  style={[styles.viewDetailsButton, { backgroundColor: Colors.primary[500] }]}
+                  style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}
                 >
-                  <Text style={styles.viewDetailsText}>View Details</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                  <LinearGradient
+                    colors={['#3B82F6', '#8B5CF6']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.viewDetailsButton}
+                  >
+                    <Text style={styles.viewDetailsText}>View Full Details</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                  </LinearGradient>
                 </Pressable>
               </Animated.View>
             )}
@@ -363,26 +432,70 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
     alignSelf: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
-  modalContent: { padding: 20, paddingBottom: 44 },
-  modalTitle: { fontSize: 24, fontWeight: '900', marginBottom: 24, textAlign: 'center', letterSpacing: -0.3 },
-  resultContainer: { alignItems: 'center', marginTop: 28, gap: 14 },
-  resultText: { fontSize: 20, fontWeight: '800', marginTop: 8 },
+  modalContent: { padding: 20, paddingBottom: 52 },
+  modalHeaderIcon: { alignItems: 'center', marginBottom: 16 },
+  modalIconCircle: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: { fontSize: 24, fontWeight: '900', textAlign: 'center', letterSpacing: -0.3 },
+  modalSubtitle: { fontSize: 13, fontWeight: '500', textAlign: 'center', marginTop: 6, marginBottom: 20, lineHeight: 18, opacity: 0.8 },
+  stepsWrapper: { marginBottom: 8 },
+  resultContainer: { alignItems: 'center', marginTop: 12, gap: 16 },
+  resultCard: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 28,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 12,
+  },
+  resultText: { fontSize: 18, fontWeight: '800', marginTop: 4 },
+  resultDetailsCard: {
+    width: '100%',
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    gap: 4,
+  },
+  resultDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+  },
+  resultDetailIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resultDetailLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.3 },
+  resultDetailValue: { fontSize: 13, fontWeight: '600', marginTop: 2 },
   txText: { fontSize: 12, marginTop: 4, opacity: 0.7 },
   viewDetailsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 18,
-    marginTop: 20,
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 36,
+    paddingVertical: 18,
+    borderRadius: 20,
+    marginTop: 8,
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
+    width: '100%',
   },
   viewDetailsText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
   runningIndicator: {

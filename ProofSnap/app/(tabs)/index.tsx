@@ -24,11 +24,17 @@ export default function HomeScreen() {
   const { isDark, colors } = useThemeColors();
   const { records, stats, publicKey, loadRecords, refreshStats } = useAppStore();
   const [refreshing, setRefreshing] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   useFocusEffect(
     useCallback(() => {
-      loadRecords();
-      refreshStats();
+      let active = true;
+      // Load data without blocking UI render
+      (async () => {
+        await Promise.all([loadRecords(), refreshStats()]);
+        if (active) setIsLoading(false);
+      })();
+      return () => { active = false; };
     }, [])
   );
 
@@ -128,6 +134,35 @@ export default function HomeScreen() {
           </Pressable>
         </Animated.View>
 
+        {/* Verify Proof CTA — right below Capture */}
+        <Animated.View entering={FadeInDown.delay(350).springify()}>
+          <Pressable
+            onPress={() => router.push('/verify-proof')}
+            style={({ pressed }) => [
+              {
+                opacity: pressed ? 0.9 : 1,
+                transform: [{ scale: pressed ? 0.98 : 1 }],
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={isDark ? ['#065F46', '#064E3B'] : ['#10B981', '#059669']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.verifyProofButton}
+            >
+              <View style={styles.captureIconBg}>
+                <Ionicons name="shield-checkmark" size={22} color="#FFFFFF" />
+              </View>
+              <View style={styles.captureTextContainer}>
+                <Text style={styles.captureButtonText}>Verify a Proof</Text>
+                <Text style={styles.captureSubtext}>Check image authenticity on-chain</Text>
+              </View>
+              <Ionicons name="arrow-forward-circle" size={24} color="rgba(255,255,255,0.7)" />
+            </LinearGradient>
+          </Pressable>
+        </Animated.View>
+
         {/* Recent Activity */}
         <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -157,7 +192,7 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* Info Card */}
-        <Animated.View entering={FadeInDown.delay(600).springify()}>
+        <Animated.View entering={FadeInDown.delay(650).springify()}>
           <View style={[styles.infoCard, { backgroundColor: isDark ? Colors.dark.card : Colors.light.card, borderColor: isDark ? Colors.dark.border : Colors.light.border }]}>
             <View style={styles.infoRow}>
               <Ionicons name="finger-print" size={20} color={Colors.primary[500]} />
@@ -179,7 +214,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 10 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 40 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -222,10 +257,23 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 18,
     borderRadius: 20,
-    marginBottom: 24,
+    marginBottom: 12,
     shadowColor: '#3B82F6',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  verifyProofButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 18,
+    borderRadius: 20,
+    marginBottom: 24,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
     shadowRadius: 10,
     elevation: 6,
   },

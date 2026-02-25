@@ -86,6 +86,14 @@ export default function RootLayout() {
             headerShadowVisible: false,
           }}
         />
+        <Stack.Screen
+          name="verify-proof"
+          options={{
+            presentation: 'card',
+            animation: 'slide_from_right',
+            headerShown: false,
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
       <Toast />

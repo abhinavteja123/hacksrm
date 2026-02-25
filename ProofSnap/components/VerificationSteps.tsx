@@ -18,16 +18,37 @@ export function VerificationSteps({ steps }: VerificationStepsProps) {
       {steps.map((step, index) => (
         <Animated.View
           key={step.id}
-          entering={FadeInDown.delay(index * 100).springify()}
+          entering={FadeInDown.delay(index * 80).springify()}
           style={[
             styles.step,
             {
               backgroundColor: isDark ? Colors.dark.card : Colors.light.card,
-              borderColor: isDark ? Colors.dark.border : Colors.light.border,
+              borderColor:
+                step.status === 'success'
+                  ? Colors.success + '40'
+                  : step.status === 'error'
+                  ? Colors.danger + '40'
+                  : isDark
+                  ? Colors.dark.border
+                  : Colors.light.border,
             },
           ]}
         >
-          <View style={styles.stepIconContainer}>
+          <View
+            style={[
+              styles.stepIconContainer,
+              {
+                backgroundColor:
+                  step.status === 'success'
+                    ? Colors.success + '15'
+                    : step.status === 'error'
+                    ? Colors.danger + '15'
+                    : step.status === 'running'
+                    ? Colors.primary[500] + '15'
+                    : 'transparent',
+              },
+            ]}
+          >
             {step.status === 'waiting' && (
               <View style={[styles.waitingDot, { backgroundColor: colors.textSecondary }]} />
             )}
@@ -99,16 +120,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     paddingHorizontal: 14,
-    marginBottom: 6,
+    marginBottom: 8,
     borderRadius: 16,
     borderWidth: 1,
   },
   stepIconContainer: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 16,
+    borderRadius: 12,
   },
   connector: {
     position: 'absolute',

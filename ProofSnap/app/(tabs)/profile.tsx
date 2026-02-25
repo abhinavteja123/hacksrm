@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+﻿import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   Alert,
+  Linking,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
 
 import { Colors } from '@/constants/Colors';
-import { BLOCK_EXPLORER } from '@/constants/config';
+import { BLOCK_EXPLORER, DATAHAVEN_FAUCET, WALLET_PRIVATE_KEY } from '@/constants/config';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAppStore } from '@/stores/media-store';
 
@@ -24,8 +25,15 @@ export default function ProfileScreen() {
   const { isDark, colors } = useThemeColors();
   const { publicKey, walletAddress, walletBalance, stats, refreshWallet, refreshStats } = useAppStore();
 
+  // Whether the app is using the hardcoded deployer wallet
+  const isConfiguredWallet = !!WALLET_PRIVATE_KEY && WALLET_PRIVATE_KEY.trim().length > 0;
+  // Balance as a float to detect zero/low
+  const balanceNum = parseFloat(walletBalance ?? '0') || 0;
+  const hasLowBalance = balanceNum < 0.01;
+
   useFocusEffect(
     useCallback(() => {
+      // Non-blocking: refresh data asynchronously
       refreshWallet();
       refreshStats();
     }, [])
@@ -40,21 +48,39 @@ export default function ProfileScreen() {
     }
   };
 
+  const openFaucet = () => {
+    Linking.openURL(DATAHAVEN_FAUCET).catch(() =>
+      Alert.alert('Error', 'Could not open faucet URL.')
+    );
+  };
+
+  const openExplorer = (address: string) => {
+    Linking.openURL(`${BLOCK_EXPLORER}/address/${address}`).catch(() =>
+      Alert.alert('Error', 'Could not open explorer URL.')
+    );
+  };
+
   const InfoRow = ({
     icon,
     label,
     value,
     copyable,
+    onTap,
+    accentColor,
     delay = 0,
   }: {
     icon: string;
     label: string;
     value: string;
     copyable?: boolean;
+    onTap?: () => void;
+    accentColor?: string;
     delay?: number;
   }) => (
     <Animated.View entering={FadeInDown.delay(delay).springify()}>
-      <View
+      <Pressable
+        onPress={onTap}
+        disabled={!onTap && !copyable}
         style={[
           styles.infoRow,
           {
@@ -63,8 +89,8 @@ export default function ProfileScreen() {
           },
         ]}
       >
-        <View style={[styles.iconCircle, { backgroundColor: isDark ? Colors.dark.elevated : Colors.primary[50] }]}>
-          <Ionicons name={icon as any} size={18} color={Colors.primary[500]} />
+        <View style={[styles.iconCircle, { backgroundColor: (accentColor ?? Colors.primary[500]) + '18' }]}>
+          <Ionicons name={icon as any} size={18} color={accentColor ?? Colors.primary[500]} />
         </View>
         <View style={styles.infoContent}>
           <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{label}</Text>
@@ -76,11 +102,15 @@ export default function ProfileScreen() {
           <Pressable
             onPress={() => copyToClipboard(value, label)}
             style={({ pressed }) => [styles.copyButton, { opacity: pressed ? 0.5 : 1 }]}
+            hitSlop={8}
           >
             <Ionicons name="copy-outline" size={18} color={colors.textSecondary} />
           </Pressable>
         )}
-      </View>
+        {onTap && !copyable && (
+          <Ionicons name="open-outline" size={16} color={colors.textSecondary} />
+        )}
+      </Pressable>
     </Animated.View>
   );
 
@@ -142,25 +172,78 @@ export default function ProfileScreen() {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Blockchain Wallet</Text>
         </Animated.View>
 
+        {/* Wallet type badge */}
+        <Animated.View entering={FadeInDown.delay(370).springify()}>
+          <View style={[styles.walletTypeBadge, {
+            backgroundColor: isConfiguredWallet
+              ? Colors.success + '15'
+              : Colors.primary[500] + '15',
+            borderColor: isConfiguredWallet
+              ? Colors.success + '40'
+              : Colors.primary[500] + '40',
+          }]}>
+            <Ionicons
+              name={isConfiguredWallet ? 'shield-checkmark' : 'phone-portrait-outline'}
+              size={14}
+              color={isConfiguredWallet ? Colors.success : Colors.primary[500]}
+            />
+            <Text style={[styles.walletTypeBadgeText, {
+              color: isConfiguredWallet ? Colors.success : Colors.primary[500],
+            }]}>
+              {isConfiguredWallet ? 'Configured deployer wallet' : 'Device-generated wallet'}
+            </Text>
+          </View>
+        </Animated.View>
+
         <InfoRow
           icon="wallet"
           label="Wallet Address"
           value={walletAddress ?? 'Loading...'}
           copyable={!!walletAddress}
+          onTap={walletAddress ? () => openExplorer(walletAddress) : undefined}
           delay={400}
         />
 
+        {/* Balance row with low-balance warning */}
         <InfoRow
           icon="diamond"
           label="Testnet Balance (MOCK)"
-          value={`${walletBalance} MOCK`}
+          value={`${parseFloat(walletBalance ?? '0').toFixed(4)} MOCK`}
+          accentColor={hasLowBalance ? Colors.danger : Colors.success}
           delay={450}
         />
+
+        {/* Low balance warning + faucet CTA */}
+        {hasLowBalance && (
+          <Animated.View entering={FadeInDown.delay(470).springify()}>
+            <Pressable
+              onPress={openFaucet}
+              style={({ pressed }) => [
+                styles.faucetBanner,
+                {
+                  backgroundColor: isDark ? '#7C2D12' + 'AA' : '#FEF3C7',
+                  borderColor: '#F59E0B40',
+                  opacity: pressed ? 0.85 : 1,
+                },
+              ]}
+            >
+              <Ionicons name="warning" size={16} color="#F59E0B" />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.faucetTitle, { color: isDark ? '#FCD34D' : '#92400E' }]}>
+                  Insufficient MOCK tokens for gas
+                </Text>
+                <Text style={[styles.faucetSubtext, { color: isDark ? '#FCD34D' + 'BB' : '#92400E' + 'BB' }]}>
+                  Tap to get free tokens from the DataHaven faucet â†’
+                </Text>
+              </View>
+            </Pressable>
+          </Animated.View>
+        )}
 
         <InfoRow
           icon="globe"
           label="Network"
-          value="DataHaven Testnet"
+          value="DataHaven Testnet (EVM)"
           delay={500}
         />
 
@@ -171,7 +254,7 @@ export default function ProfileScreen() {
 
         <InfoRow icon="information-circle" label="Version" value="1.0.0" delay={600} />
         <InfoRow icon="shield" label="Security" value="Ed25519 + SHA-256" delay={650} />
-        <InfoRow icon="link" label="Blockchain" value="DataHaven (EVM)" delay={700} />
+        <InfoRow icon="link" label="Blockchain" value="DataHaven (EVM, Chain 55931)" delay={700} />
         <InfoRow icon="eye" label="AI Detection" value="SightEngine" delay={750} />
 
         {/* How It Works */}
@@ -196,7 +279,7 @@ export default function ProfileScreen() {
           </View>
         </Animated.View>
 
-        <View style={{ height: 30 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -235,6 +318,17 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
   statDivider: { width: 1, height: 36 },
   sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10, marginTop: 10 },
+  walletTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  walletTypeBadgeText: { fontSize: 13, fontWeight: '700' },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -255,6 +349,17 @@ const styles = StyleSheet.create({
   infoLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.3 },
   infoValue: { fontSize: 14, fontWeight: '600', marginTop: 3 },
   copyButton: { padding: 10 },
+  faucetBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  faucetTitle: { fontSize: 13, fontWeight: '700' },
+  faucetSubtext: { fontSize: 12, fontWeight: '500', marginTop: 3 },
   howItWorks: {
     borderRadius: 20,
     borderWidth: 1,
@@ -278,3 +383,4 @@ const styles = StyleSheet.create({
   howStepNumberText: { fontSize: 14, fontWeight: '800' },
   howStepText: { fontSize: 14, flex: 1, fontWeight: '500' },
 });
+
