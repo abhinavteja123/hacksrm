@@ -48,6 +48,7 @@ export interface SupabaseProof {
   file_type: string;
   file_name: string;
   file_size: number;
+  image_url: string | null;
   device_info: string | null;
   status: string;
   created_at: string;
@@ -77,6 +78,7 @@ export async function uploadProofToSupabase(record: MediaRecord): Promise<boolea
       file_type: record.fileType,
       file_name: record.fileName,
       file_size: record.fileSize,
+      image_url: record.imageUrl,
       device_info: record.deviceInfo,
       status: record.status,
       created_at: record.createdAt,
@@ -222,6 +224,7 @@ CREATE TABLE proofs (
   file_type TEXT NOT NULL,
   file_name TEXT NOT NULL,
   file_size BIGINT DEFAULT 0,
+  image_url TEXT,
   device_info TEXT,
   status TEXT DEFAULT 'pending',
   created_at TIMESTAMPTZ DEFAULT NOW()

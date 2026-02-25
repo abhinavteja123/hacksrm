@@ -6,7 +6,7 @@ import { detectDeepfake, checkPlagiarism } from './ai-detection';
 import { computeTrustScore } from './trust-score';
 import { applyVisibleWatermark, generateInvisibleWatermarkId } from './watermark';
 import { insertMediaRecord, updateMediaRecord } from './db';
-import { uploadProofToSupabase } from './supabase';
+import { uploadProofToSupabase, uploadThumbnailToStorage } from './supabase';
 import type { MediaRecord, VerificationStep } from './types';
 import { getGrade } from '@/constants/Colors';
 
@@ -74,6 +74,7 @@ export async function runVerificationPipeline(
     trustScore: 0,
     trustGrade: 'F',
     watermarkedUri: null,
+    imageUrl: null,
     status: 'verifying',
     deviceInfo: `${Platform.OS} ${Platform.Version}`,
     location: null,
@@ -211,6 +212,20 @@ export async function runVerificationPipeline(
     // Step 8: Supabase cloud sync
     steps = updateStep(steps, 'cloud', 'running');
     onProgress(steps);
+
+    // Upload image to Supabase storage bucket first
+    if (imageBase64 && imageBase64.length > 0) {
+      try {
+        const publicImageUrl = await uploadThumbnailToStorage(recordId, imageBase64, 'image/jpeg');
+        if (publicImageUrl) {
+          record.imageUrl = publicImageUrl;
+          console.log('[Pipeline] Image uploaded to Supabase storage:', publicImageUrl);
+        }
+      } catch (err) {
+        console.warn('[Pipeline] Image upload to storage failed:', err);
+      }
+    }
+
     const cloudSynced = await uploadProofToSupabase(record);
     steps = updateStep(
       steps,

@@ -2,6 +2,18 @@ import { API_BASE_URL } from '@/constants/config';
 import * as FileSystem from 'expo-file-system/legacy';
 import type { AIDetectionResult, PlagiarismResult } from './types';
 
+// Timeout wrapper for async operations  
+const API_TIMEOUT = 30000; // 30 seconds
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+    ),
+  ]);
+}
+
 // AI Deepfake detection - calls backend which proxies to SightEngine
 export async function detectDeepfake(imageBase64: string): Promise<AIDetectionResult> {
   try {
@@ -15,15 +27,19 @@ export async function detectDeepfake(imageBase64: string): Promise<AIDetectionRe
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    // Upload as multipart form-data (matches server's multer expectation)
-    const uploadResult = await FileSystem.uploadAsync(
-      `${API_BASE_URL}/api/detect`,
-      tmpUri,
-      {
-        fieldName: 'media',
-        httpMethod: 'POST',
-        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-      }
+    // Upload as multipart form-data with timeout (matches server's multer expectation)
+    const uploadResult = await withTimeout(
+      FileSystem.uploadAsync(
+        `${API_BASE_URL}/api/detect`,
+        tmpUri,
+        {
+          fieldName: 'media',
+          httpMethod: 'POST',
+          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+        }
+      ),
+      API_TIMEOUT,
+      'AI detection'
     );
 
     // Clean up temp file
@@ -76,14 +92,18 @@ export async function checkPlagiarism(imageBase64: string): Promise<PlagiarismRe
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    const uploadResult = await FileSystem.uploadAsync(
-      `${API_BASE_URL}/api/plagiarism`,
-      tmpUri,
-      {
-        fieldName: 'media',
-        httpMethod: 'POST',
-        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-      }
+    const uploadResult = await withTimeout(
+      FileSystem.uploadAsync(
+        `${API_BASE_URL}/api/plagiarism`,
+        tmpUri,
+        {
+          fieldName: 'media',
+          httpMethod: 'POST',
+          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+        }
+      ),
+      API_TIMEOUT,
+      'Plagiarism check'
     );
 
     // Clean up temp file

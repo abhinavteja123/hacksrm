@@ -18,6 +18,7 @@ export interface MediaRecord {
   trustScore: number;
   trustGrade: string;
   watermarkedUri: string | null;
+  imageUrl: string | null;
   status: VerificationStatus;
   deviceInfo: string;
   location: string | null;

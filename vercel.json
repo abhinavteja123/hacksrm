@@ -8,6 +8,10 @@
   ],
   "routes": [
     {
+      "src": "/admin(.*)",
+      "dest": "ProofSnap/server/index.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "ProofSnap/server/index.js"
     }

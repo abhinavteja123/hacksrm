@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS proofs (
   file_type TEXT NOT NULL,
   file_name TEXT NOT NULL,
   file_size BIGINT DEFAULT 0,
+  image_url TEXT,
   device_info TEXT,
   status TEXT DEFAULT 'pending',
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -57,3 +58,8 @@ CREATE POLICY "Anyone can upload media" ON storage.objects
 --  - Project URL  → paste in constants/config.ts as SUPABASE_URL
 --  - anon key     → paste in constants/config.ts as SUPABASE_ANON_KEY
 -- ═══════════════════════════════════════════════════════════
+
+-- ═══════════════════════════════════════════════════════════
+--  MIGRATION: If the table already exists without image_url, run:
+-- ═══════════════════════════════════════════════════════════
+-- ALTER TABLE proofs ADD COLUMN IF NOT EXISTS image_url TEXT;

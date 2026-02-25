@@ -67,8 +67,18 @@ export default function VerifyDetailScreen() {
 
   const handleShare = async () => {
     try {
+      const imageUrlLine = record.imageUrl
+        ? `\nImage URL: ${record.imageUrl}`
+        : '';
+      const txLine = record.blockchainTx
+        ? `\nBlockchain Tx: ${record.blockchainTx}`
+        : '\nBlockchain: Pending';
+      const explorerLine = record.blockchainTx
+        ? `\nExplorer: ${BLOCK_EXPLORER}/tx/${record.blockchainTx}`
+        : '';
+
       await Share.share({
-        message: `ProofSnap Verification\n\nTrust Score: ${record.trustScore}/100 (Grade ${record.trustGrade})\nFile Hash: ${record.fileHash}\nBlockchain Tx: ${record.blockchainTx ?? 'Pending'}\n\nVerified by ProofSnap - Proof of Capture`,
+        message: `ProofSnap Verification\n\nTrust Score: ${record.trustScore}/100 (Grade ${record.trustGrade})\nFile Hash: ${record.fileHash}${txLine}${explorerLine}${imageUrlLine}\n\nVerified by ProofSnap - Proof of Capture`,
       });
     } catch {}
   };
@@ -194,7 +204,19 @@ export default function VerifyDetailScreen() {
 
           {record.blockchainTx && (
             <Pressable
-              onPress={() => Linking.openURL(`${BLOCK_EXPLORER}/tx/${record.blockchainTx}`)}
+              onPress={() => {
+                const explorerUrl = `${BLOCK_EXPLORER}/tx/${record.blockchainTx}`;
+                Linking.openURL(explorerUrl).catch(() => {
+                  Alert.alert(
+                    'Explorer Unavailable',
+                    `Could not open the block explorer. The transaction hash is:\n\n${record.blockchainTx}\n\nExplorer URL: ${explorerUrl}`,
+                    [
+                      { text: 'Copy Tx Hash', onPress: () => copyText(record.blockchainTx!, 'Tx Hash') },
+                      { text: 'OK' },
+                    ]
+                  );
+                });
+              }}
               style={({ pressed }) => [
                 styles.actionButton,
                 {
@@ -299,6 +321,13 @@ export default function VerifyDetailScreen() {
           <DataRow label="Capture Time" value={new Date(record.createdAt).toLocaleString()} />
           <DataRow label="File Type" value={record.fileType.toUpperCase()} />
           <DataRow label="File Size" value={formatBytes(record.fileSize)} />
+          {record.imageUrl && (
+            <DataRow
+              label="Public Image URL"
+              value={record.imageUrl}
+              onCopy={() => copyText(record.imageUrl!, 'Image URL')}
+            />
+          )}
         </Section>
 
         <View style={{ height: 30 }} />

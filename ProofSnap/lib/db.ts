@@ -32,6 +32,7 @@ async function initSchema() {
       trustScore REAL DEFAULT 0,
       trustGrade TEXT DEFAULT 'F',
       watermarkedUri TEXT,
+      imageUrl TEXT,
       status TEXT DEFAULT 'pending',
       deviceInfo TEXT,
       location TEXT,
@@ -47,9 +48,9 @@ export async function insertMediaRecord(record: MediaRecord): Promise<void> {
     `INSERT OR REPLACE INTO media_records 
      (id, fileUri, fileName, fileType, fileSize, fileHash, signature, publicKey,
       timestamp, blockchainTx, blockNumber, aiDeepfakeScore, aiGeneratedScore,
-      plagiarismScore, trustScore, trustGrade, watermarkedUri, status,
+      plagiarismScore, trustScore, trustGrade, watermarkedUri, imageUrl, status,
       deviceInfo, location, createdAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       record.id,
       record.fileUri,
@@ -68,6 +69,7 @@ export async function insertMediaRecord(record: MediaRecord): Promise<void> {
       record.trustScore,
       record.trustGrade,
       record.watermarkedUri,
+      record.imageUrl,
       record.status,
       record.deviceInfo,
       record.location,
