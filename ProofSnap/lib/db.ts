@@ -40,6 +40,13 @@ async function initSchema() {
       updatedAt TEXT NOT NULL
     );
   `);
+
+  // Migration: add imageUrl column if missing (for existing databases)
+  try {
+    await db.execAsync(`ALTER TABLE media_records ADD COLUMN imageUrl TEXT;`);
+  } catch {
+    // Column already exists — ignore
+  }
 }
 
 export async function insertMediaRecord(record: MediaRecord): Promise<void> {
