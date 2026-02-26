@@ -57,7 +57,9 @@ export default function CaptureScreen() {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images', 'videos'],
-        quality: 0.85,
+        // NOTE: Do NOT set quality here. Specifying quality causes JPEG
+        // recompression, which produces different bytes on every pick
+        // and breaks verify-by-image hash matching.
       });
 
       if (!result.canceled && result.assets[0]) {

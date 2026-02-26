@@ -71,7 +71,9 @@ export default function VerifyProofScreen() {
     }
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      quality: 1,
+      // NOTE: Do NOT set quality here. Must match import flow
+      // (no recompression) so the same gallery image produces
+      // the same hash in both import and verify.
     });
     if (!res.canceled && res.assets[0]) {
       setImageUri(res.assets[0].uri);
