@@ -355,35 +355,40 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 
   // Header
-  header: { paddingHorizontal: 16, marginBottom: 8 },
+  header: { paddingHorizontal: 20, marginBottom: 10 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  title: { fontSize: 28, fontWeight: '800' },
-  subtitle: { fontSize: 14, marginTop: 2 },
+  title: { fontSize: 30, fontWeight: '900', letterSpacing: -0.8 },
+  subtitle: { fontSize: 14, marginTop: 3, opacity: 0.7 },
   scanButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 24,
+    gap: 7,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
+    borderRadius: 14,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  scanButtonText: { color: '#FFF', fontWeight: '700', fontSize: 14 },
+  scanButtonText: { color: '#FFF', fontWeight: '800', fontSize: 14, letterSpacing: -0.2 },
 
   // Stats
   statsRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 16,
+    marginTop: 18,
   },
   statCard: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 14,
+    paddingVertical: 14,
+    borderRadius: 16,
     gap: 4,
   },
-  statValue: { fontSize: 22, fontWeight: '800' },
-  statLabel: { fontSize: 11, fontWeight: '600' },
+  statValue: { fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
+  statLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
 
   // Progress
   progressBar: {
@@ -413,38 +418,38 @@ const styles = StyleSheet.create({
   // Filters
   filterRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     gap: 6,
-    marginBottom: 12,
+    marginBottom: 14,
     flexWrap: 'wrap',
   },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 12,
     borderWidth: 1,
   },
-  filterText: { fontSize: 11, fontWeight: '600' },
+  filterText: { fontSize: 11, fontWeight: '700' },
 
   // Card
   card: {
     flexDirection: 'row',
-    marginHorizontal: 16,
+    marginHorizontal: 20,
     marginBottom: 10,
-    borderRadius: 14,
+    borderRadius: 18,
     overflow: 'hidden',
   },
   thumbnail: {
-    width: 80,
-    height: 100,
+    width: 84,
+    height: 104,
   },
   cardInfo: {
     flex: 1,
-    padding: 10,
-    gap: 4,
+    padding: 12,
+    gap: 5,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -454,21 +459,22 @@ const styles = StyleSheet.create({
   },
   cardFileName: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     flex: 1,
+    letterSpacing: -0.2,
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    paddingHorizontal: 7,
+    paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 10,
+    borderRadius: 8,
   },
   badgeText: {
     fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontWeight: '900',
+    letterSpacing: 0.6,
   },
   cardMeta: {
     flexDirection: 'row',
@@ -478,32 +484,32 @@ const styles = StyleSheet.create({
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 4,
   },
-  metaText: { fontSize: 11 },
+  metaText: { fontSize: 11, opacity: 0.8 },
   tamperDetail: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginTop: 2,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 8,
+    marginTop: 3,
   },
   tamperText: {
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '700',
   },
-  timeText: { fontSize: 10, marginTop: 2 },
+  timeText: { fontSize: 10, marginTop: 3, opacity: 0.6 },
 
   // List
-  listContent: { paddingBottom: 20 },
+  listContent: { paddingBottom: 100 },
 
   // Empty
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 80,
-    paddingHorizontal: 32,
+    paddingBottom: 100,
+    paddingHorizontal: 40,
   },
-  emptyTitle: { fontSize: 16, fontWeight: '700', marginTop: 16, textAlign: 'center' },
-  emptySubtitle: { fontSize: 13, marginTop: 8, textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { fontSize: 17, fontWeight: '700', marginTop: 18, textAlign: 'center' },
+  emptySubtitle: { fontSize: 13, marginTop: 8, textAlign: 'center', lineHeight: 20, opacity: 0.7 },
 });

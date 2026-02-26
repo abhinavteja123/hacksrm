@@ -9,8 +9,8 @@ import { Colors } from '@/constants/Colors';
 import type { MediaRecord } from '@/lib/types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const CARD_PADDING = 16;
-const GRID_GAP = 10;
+const CARD_PADDING = 20;
+const GRID_GAP = 12;
 const COLUMNS = 2;
 const CARD_WIDTH = (SCREEN_WIDTH - CARD_PADDING * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
 
@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: GRID_GAP,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
   imageContainer: {
     width: '100%',
@@ -150,42 +150,46 @@ const styles = StyleSheet.create({
   },
   statusDot: {
     position: 'absolute',
-    bottom: 8,
-    left: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    bottom: 10,
+    left: 10,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.8)',
   },
   cardWatermark: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    paddingTop: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingTop: 20,
   },
   cardWmBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 4,
   },
   cardWmText: {
     color: '#FFFFFF',
     fontSize: 9,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
   info: {
     padding: 12,
   },
   scoreText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: -0.2,
   },
   dateText: {
     fontSize: 11,
     marginTop: 3,
-    opacity: 0.7,
+    opacity: 0.6,
   },
   listCard: {
     flexDirection: 'row',
@@ -194,19 +198,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   listImage: {
-    width: 76,
-    height: 76,
+    width: 80,
+    height: 80,
     backgroundColor: '#000',
   },
   listInfo: {
     flex: 1,
-    padding: 10,
+    padding: 12,
     justifyContent: 'center',
   },
   listTop: {
@@ -216,16 +220,19 @@ const styles = StyleSheet.create({
   },
   listTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     flex: 1,
     marginRight: 8,
+    letterSpacing: -0.2,
   },
   listDetail: {
     fontSize: 12,
-    marginTop: 3,
+    marginTop: 4,
+    opacity: 0.8,
   },
   listDate: {
     fontSize: 11,
-    marginTop: 1,
+    marginTop: 2,
+    opacity: 0.6,
   },
 });

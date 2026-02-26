@@ -12,6 +12,7 @@ import { useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Colors } from '@/constants/Colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -20,8 +21,8 @@ import { MediaCard } from '@/components/MediaCard';
 import type { MediaRecord } from '@/lib/types';
 
 const { width } = Dimensions.get('window');
-const CARD_GAP = 10;
-const CARD_WIDTH = (width - 32 - CARD_GAP) / 2;
+const CARD_GAP = 12;
+const CARD_WIDTH = (width - 40 - CARD_GAP) / 2;
 
 type FilterType = 'all' | 'verified' | 'pending' | 'failed';
 
@@ -68,61 +69,75 @@ export default function GalleryScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Gallery</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {filtered.length} {filter === 'all' ? 'total' : filter} items
-        </Text>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={[styles.title, { color: colors.text }]}>Gallery</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {filtered.length} {filter === 'all' ? 'total' : filter} items
+            </Text>
+          </View>
+          <View style={[styles.countBadge, { backgroundColor: isDark ? 'rgba(59,130,246,0.1)' : 'rgba(59,130,246,0.06)' }]}>
+            <Ionicons name="images" size={16} color={Colors.primary[500]} />
+            <Text style={[styles.countText, { color: Colors.primary[500] }]}>{records.length}</Text>
+          </View>
+        </View>
       </View>
 
       {/* Filter chips */}
       <View style={styles.filterRow}>
-        {filters.map((f) => (
-          <Pressable
-            key={f.key}
-            onPress={() => setFilter(f.key)}
-            style={[
-              styles.filterChip,
-              {
-                backgroundColor:
-                  filter === f.key
+        {filters.map((f) => {
+          const isActive = filter === f.key;
+          return (
+            <Pressable
+              key={f.key}
+              onPress={() => setFilter(f.key)}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: isActive
                     ? Colors.primary[500]
                     : isDark
                     ? Colors.dark.card
                     : Colors.light.card,
-                borderColor:
-                  filter === f.key
+                  borderColor: isActive
                     ? Colors.primary[500]
                     : isDark
                     ? Colors.dark.border
                     : Colors.light.border,
-              },
-            ]}
-          >
-            <Ionicons
-              name={f.icon as any}
-              size={14}
-              color={filter === f.key ? '#FFFFFF' : colors.textSecondary}
-            />
-            <Text
-              style={[
-                styles.filterText,
-                {
-                  color: filter === f.key ? '#FFFFFF' : colors.textSecondary,
                 },
               ]}
             >
-              {f.label}
-            </Text>
-          </Pressable>
-        ))}
+              <Ionicons
+                name={f.icon as any}
+                size={14}
+                color={isActive ? '#FFFFFF' : colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.filterText,
+                  {
+                    color: isActive ? '#FFFFFF' : colors.textSecondary,
+                  },
+                ]}
+              >
+                {f.label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {/* Grid */}
       {filtered.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="images-outline" size={64} color={colors.textSecondary} style={{ opacity: 0.4 }} />
-          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+          <View style={[styles.emptyIconCircle, { backgroundColor: isDark ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.05)' }]}>
+            <Ionicons name="images-outline" size={40} color={Colors.primary[400]} />
+          </View>
+          <Text style={[styles.emptyText, { color: colors.text }]}>
             {filter === 'all' ? 'No verified media yet' : `No ${filter} items`}
+          </Text>
+          <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
+            Capture or import media to see it here
           </Text>
         </View>
       ) : (
@@ -145,12 +160,23 @@ export default function GalleryScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 16, marginBottom: 14 },
-  title: { fontSize: 30, fontWeight: '900', letterSpacing: -0.5 },
-  subtitle: { fontSize: 14, marginTop: 4, fontWeight: '500' },
+  header: { paddingHorizontal: 20, marginBottom: 16 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  title: { fontSize: 30, fontWeight: '900', letterSpacing: -0.8 },
+  subtitle: { fontSize: 14, marginTop: 4, fontWeight: '500', opacity: 0.7 },
+  countBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    marginTop: 4,
+  },
+  countText: { fontSize: 16, fontWeight: '800' },
   filterRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     gap: 8,
     marginBottom: 18,
   },
@@ -160,20 +186,29 @@ const styles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 24,
+    borderRadius: 12,
     borderWidth: 1,
   },
   filterText: { fontSize: 12, fontWeight: '700' },
   row: {
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
-  gridContent: { paddingBottom: 24 },
+  gridContent: { paddingBottom: 100 },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 80,
+    paddingBottom: 100,
   },
-  emptyText: { fontSize: 16, fontWeight: '700', marginTop: 16 },
+  emptyIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  emptyText: { fontSize: 17, fontWeight: '700', marginTop: 12 },
+  emptySubtext: { fontSize: 13, marginTop: 6, opacity: 0.7 },
 });

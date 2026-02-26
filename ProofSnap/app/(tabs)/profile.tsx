@@ -279,7 +279,7 @@ export default function ProfileScreen() {
           </View>
         </Animated.View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
@@ -287,43 +287,43 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 10 },
-  headerSection: { alignItems: 'center', marginBottom: 28 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 10 },
+  headerSection: { alignItems: 'center', marginBottom: 30 },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  headerTitle: { fontSize: 26, fontWeight: '900', letterSpacing: -0.3 },
-  headerSubtitle: { fontSize: 14, marginTop: 4, fontWeight: '500' },
+  headerTitle: { fontSize: 28, fontWeight: '900', letterSpacing: -0.5 },
+  headerSubtitle: { fontSize: 14, marginTop: 5, fontWeight: '500', opacity: 0.7 },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     marginBottom: 28,
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 20,
     borderWidth: 1,
   },
   statItem: { alignItems: 'center' },
-  statNumber: { fontSize: 26, fontWeight: '900' },
-  statLabel: { fontSize: 12, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
-  statDivider: { width: 1, height: 36 },
-  sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10, marginTop: 10 },
+  statNumber: { fontSize: 28, fontWeight: '900', letterSpacing: -0.5 },
+  statLabel: { fontSize: 10, fontWeight: '700', marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.6 },
+  statDivider: { width: 1, height: 40 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10, marginTop: 12, letterSpacing: -0.2 },
   walletTypeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingVertical: 10,
     borderRadius: 14,
     borderWidth: 1,
     marginBottom: 8,
@@ -341,13 +341,13 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   infoContent: { flex: 1 },
-  infoLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.3 },
-  infoValue: { fontSize: 14, fontWeight: '600', marginTop: 3 },
+  infoLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  infoValue: { fontSize: 14, fontWeight: '600', marginTop: 4, letterSpacing: -0.1 },
   copyButton: { padding: 10 },
   faucetBanner: {
     flexDirection: 'row',
@@ -366,21 +366,21 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 12,
   },
-  howTitle: { fontSize: 18, fontWeight: '800', marginBottom: 16 },
+  howTitle: { fontSize: 18, fontWeight: '900', marginBottom: 18, letterSpacing: -0.3 },
   howStep: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   howStepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 34,
+    height: 34,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  howStepNumberText: { fontSize: 14, fontWeight: '800' },
+  howStepNumberText: { fontSize: 14, fontWeight: '900' },
   howStepText: { fontSize: 14, flex: 1, fontWeight: '500' },
 });
 
